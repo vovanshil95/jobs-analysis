@@ -1,1 +1,5 @@
 catboost_info
+venv/
+.env
+logs/
+__pycache__/
