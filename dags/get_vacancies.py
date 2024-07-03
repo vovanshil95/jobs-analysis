@@ -206,6 +206,8 @@ def add_vacancies_to_db(ti):
 
         df = get_vacancies_df(new_ids, rates)
 
+        df['responded'] = False
+
         df_to_db(df.drop('key_skills', axis=1), cur, 'vacancy')
 
         cur.execute('SELECT id, name_ FROM key_skill')
@@ -246,12 +248,17 @@ def change_jobs_status(ti):
 
     if len(unfound_ids) > 0:
         unfound_jobs = get_vacancies_df(unfound_ids, rates)
-        sql_engine = get_postgres()
+        unfound_jobs.sort_values(by='id')
         
         sql_config = get_postgres()
         
         with psycopg2.connect(**sql_config) as connection:
             cur = connection.cursor()
+
+            cur.execute(f'select responded from vacancy where id in ({", ".join(map(str, unfound_ids))}) order by id')
+            result = cur.fetchall()
+            responded = pd.Series([row[0] for row in result])
+            unfound_jobs['responded'] = responded
 
             cur.execute(f'delete from vacancy where id in ({", ".join(map(str, unfound_ids))})')
             df_to_db(unfound_jobs.drop('key_skills', axis=1), cur, 'vacancy')
