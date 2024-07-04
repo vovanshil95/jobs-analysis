@@ -221,9 +221,9 @@ def add_vacancies_to_db(ti):
 
         new_key_skills = key_skills_from_hh - key_skills_from_db
 
-        new_skills_df = pd.DataFrame({'id': [random.randint(0, int(10 ** 9)) for _ in new_key_skills], 'name_': list(new_key_skills)})
-        
-        df_to_db(new_skills_df, cur, 'key_skill')
+        if len(new_key_skills) > 0:
+            new_skills_df = pd.DataFrame({'id': [random.randint(0, int(10 ** 9)) for _ in new_key_skills], 'name_': list(new_key_skills)})
+            df_to_db(new_skills_df, cur, 'key_skill')
 
         skill_vacancy = {'skill_id': [], 'vacancy_id': []}
 
