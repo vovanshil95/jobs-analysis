@@ -204,42 +204,44 @@ def add_vacancies_to_db(ti):
 
         ti.xcom_push(key='unfound_ids', value=unfound_ids)
 
-        df = get_vacancies_df(new_ids, rates)
+        if len(new_ids) > 0:
 
-        df['responded'] = False
+            df = get_vacancies_df(new_ids, rates)
 
-        df_to_db(df.drop('key_skills', axis=1), cur, 'vacancy')
+            df['responded'] = False
 
-        cur.execute('SELECT id, name_ FROM key_skill')
-        result = cur.fetchall()
+            df_to_db(df.drop('key_skills', axis=1), cur, 'vacancy')
 
-        key_skills_from_db_df =  pd.DataFrame([[row[0], row[1]] for row in result], columns=['id', 'name_'])
-        key_skills_from_db = set(key_skills_from_db_df['name_'])
+            cur.execute('SELECT id, name_ FROM key_skill')
+            result = cur.fetchall()
 
-        key_skills = df.key_skills.tolist()
-        key_skills_from_hh = {skill for sublist in key_skills for skill in sublist}
+            key_skills_from_db_df =  pd.DataFrame([[row[0], row[1]] for row in result], columns=['id', 'name_'])
+            key_skills_from_db = set(key_skills_from_db_df['name_'])
 
-        new_key_skills = key_skills_from_hh - key_skills_from_db
+            key_skills = df.key_skills.tolist()
+            key_skills_from_hh = {skill for sublist in key_skills for skill in sublist}
 
-        if len(new_key_skills) > 0:
-            new_skills_df = pd.DataFrame({'id': [random.randint(0, int(10 ** 9)) for _ in new_key_skills], 'name_': list(new_key_skills)})
-            df_to_db(new_skills_df, cur, 'key_skill')
+            new_key_skills = key_skills_from_hh - key_skills_from_db
 
-        skill_vacancy = {'skill_id': [], 'vacancy_id': []}
+            if len(new_key_skills) > 0:
+                new_skills_df = pd.DataFrame({'id': [random.randint(0, int(10 ** 9)) for _ in new_key_skills], 'name_': list(new_key_skills)})
+                df_to_db(new_skills_df, cur, 'key_skill')
 
-        all_skills = pd.concat([new_skills_df, key_skills_from_db_df])
-        for vacancy_id in new_ids:
-            skills = df[df.id == int(vacancy_id)].key_skills.iloc[0]
-            for skill in skills:
-                skill_id = all_skills[all_skills.name_ == skill].id.iloc[0]
-                skill_vacancy['skill_id'].append(skill_id)
-                skill_vacancy['vacancy_id'].append(int(vacancy_id))
+            skill_vacancy = {'skill_id': [], 'vacancy_id': []}
 
-        skill_vacancy = pd.DataFrame(skill_vacancy)
+            all_skills = pd.concat([new_skills_df, key_skills_from_db_df])
+            for vacancy_id in new_ids:
+                skills = df[df.id == int(vacancy_id)].key_skills.iloc[0]
+                for skill in skills:
+                    skill_id = all_skills[all_skills.name_ == skill].id.iloc[0]
+                    skill_vacancy['skill_id'].append(skill_id)
+                    skill_vacancy['vacancy_id'].append(int(vacancy_id))
 
-        df_to_db(skill_vacancy, cur, 'skill_vacancy')
+            skill_vacancy = pd.DataFrame(skill_vacancy)
 
-        connection.commit()
+            df_to_db(skill_vacancy, cur, 'skill_vacancy')
+
+            connection.commit()
 
 
 def change_jobs_status(ti):
