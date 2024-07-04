@@ -30,14 +30,14 @@ create table vacancy (
     responded boolean,
     grade text,
     dt timestamp
-)
+);
 
 create table key_skill (
     id serial primary key,
     name_ text
-)
+);
 
 create table skill_vacancy (
     skill_id serial,
     vacancy_id serial
-)
+);
