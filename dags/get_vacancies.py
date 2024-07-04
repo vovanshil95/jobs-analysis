@@ -226,10 +226,12 @@ def add_vacancies_to_db(ti):
             if len(new_key_skills) > 0:
                 new_skills_df = pd.DataFrame({'id': [random.randint(0, int(10 ** 9)) for _ in new_key_skills], 'name_': list(new_key_skills)})
                 df_to_db(new_skills_df, cur, 'key_skill')
+                all_skills = pd.concat([new_skills_df, key_skills_from_db_df])
+            else:
+                all_skills = key_skills_from_db_df.copy()
 
             skill_vacancy = {'skill_id': [], 'vacancy_id': []}
 
-            all_skills = pd.concat([new_skills_df, key_skills_from_db_df])
             for vacancy_id in new_ids:
                 skills = df[df.id == int(vacancy_id)].key_skills.iloc[0]
                 for skill in skills:
