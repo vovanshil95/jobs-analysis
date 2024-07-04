@@ -193,8 +193,7 @@ def add_vacancies_to_db(ti):
 
         cur.execute("""SELECT id 
                        FROM vacancy 
-                       where type_ = 'Рекламная' 
-                       or type_ = 'Открытая'""")
+                       where not archived""")
         result = cur.fetchall()
 
         ids_from_db = set([row[0] for row in result])
