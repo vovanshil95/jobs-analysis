@@ -27,6 +27,7 @@ create table vacancy (
     experience text,
     employment text,
     description_ text,
+    responded boolean,
     grade text,
     dt timestamp
 )

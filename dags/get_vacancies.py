@@ -178,7 +178,7 @@ def get_hh_vacancy_ids(search_request_text, key_words, ti):
         if len(items) < 100:
             break
     
-    job_ids = set([job['id'] for job in jobs if in_(key_words, job['name'])])
+    job_ids = set([int(job['id']) for job in jobs if in_(key_words, job['name'])])
     ti.xcom_push(key='job_ids', value=job_ids)
 
 
