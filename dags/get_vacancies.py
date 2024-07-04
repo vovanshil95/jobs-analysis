@@ -60,7 +60,6 @@ def get_vacancies_df(ids, rates):
         'vacancy_constructor_template',
         'accept_handicapped',
         'accept_kids',
-        'archived',
         'response_url',
         'code',
         'hidden',

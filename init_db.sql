@@ -28,6 +28,7 @@ create table vacancy (
     employment text,
     description_ text,
     responded boolean,
+    archived boolean,
     grade text,
     dt timestamp
 );
