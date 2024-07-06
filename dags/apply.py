@@ -97,7 +97,7 @@ def change_vacancies_status(ti):
 
     with psycopg2.connect(**sql_config) as connection:
         cur = connection.cursor()
-        cur.execute(f'update vacancy set responded = True where id in ({', '.join(vacancy_ids)})')
+        cur.execute(f'update vacancy set responded = True where id in ({', '.join([(str(el)) for el in vacancy_ids])})')
     
 
 with DAG(
