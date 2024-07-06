@@ -15,6 +15,17 @@ default_args = {
     'retry_delay': timedelta(minutes=2)
 }
 
+сovering_letter_text = '''Здравствуйте! Прошу рассмотреть моё резюме на роль Data Scientist в вашу компанию.
+
+Краткое содержание: 
+- опыт работы: 2.5 года
+- зарплатные ожидания: от 200 т.р.
+- основные компетенции: Python, Machine Learning, Data Science, SQL
+- есть опыт работы с технологиями Spark, Airflow, Docker
+- есть опыт работы с нейросетями (NLP, CV, CNN, Transformers)
+- есть опыт создания микросервиса на FastApi
+- отличное знание мат. статистики'''
+
 
 def get_postgres():
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN = os.environ.get('AIRFLOW__DATABASE__SQL_ALCHEMY_CONN')
@@ -104,7 +115,8 @@ with DAG(
     task2 = PythonOperator(
         task_id='apply_to_vacancies',
         python_callable=apply_to_vacancies,
-        op_kwargs={'resume_id': 'a57b16adff0922d1da0039ed1f796374744b4f'}
+        op_kwargs={'resume_id': 'a57b16adff0922d1da0039ed1f796374744b4f',
+                   'message': сovering_letter_text}
     )
     task3 = PythonOperator(
         task_id='change_vacancies_status',
