@@ -47,7 +47,8 @@ def get_vacancies_df(ids, rates):
     for id in ids:
         time.sleep(1)
         job = requests.get(f'https://api.hh.ru/vacancies/{id}').json()
-        jobs.append(job)
+        if 'errors' not in job.keys():
+            jobs.append(job)
 
     df = pd.DataFrame(jobs)
 

@@ -66,10 +66,11 @@ def apply_to_vacancies(resume_id, ti):
                 headers=headers,
                 params=params
             )
-            if response.status_code == 200:
+            if str(response.status_code)[0] == '2':
                 successful_responses.append(vacancy_id)
             else:
                 print(f'not successfull status code ({response.status_code}) while applying to {vacancy_id}')
+                print(f'response dict: {response.json()}')
         except Exception as e:
             print(f'Exception while applying to {vacancy_id}', e)
 
@@ -103,7 +104,7 @@ with DAG(
     task2 = PythonOperator(
         task_id='apply_to_vacancies',
         python_callable=apply_to_vacancies,
-        op_kwargs={'resume_id': 'hz_poka'}
+        op_kwargs={'resume_id': 'a57b16adff0922d1da0039ed1f796374744b4f'}
     )
     task3 = PythonOperator(
         task_id='change_vacancies_status',
