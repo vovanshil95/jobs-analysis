@@ -239,8 +239,8 @@ def add_vacancies_to_db(ti):
                     skill_vacancy['vacancy_id'].append(int(vacancy_id))
 
             skill_vacancy = pd.DataFrame(skill_vacancy)
-
-            df_to_db(skill_vacancy, cur, 'skill_vacancy')
+            if len(skill_vacancy) > 0:
+                df_to_db(skill_vacancy, cur, 'skill_vacancy')
 
             connection.commit()
 
