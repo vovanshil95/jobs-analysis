@@ -3,7 +3,7 @@ create table vacancy (
     premium boolean,
     name_ text,
     department text,
-    has_test text,
+    has_test boolean,
     response_letter_required boolean,
     area text,
     salary_from integer,

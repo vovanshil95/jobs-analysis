@@ -42,7 +42,7 @@ def get_vacancies_from_db(ti):
         
     with psycopg2.connect(**sql_config) as connection:
         cur = connection.cursor()
-        cur.execute('select id from vacancy where not responded')
+        cur.execute('select * from vacancy where (not responded) and (not has_test)')
         result = cur.fetchall()
         not_applied_ids = [row[0] for row in result]
     ti.xcom_push(key='not_applied_ids', value=not_applied_ids)
