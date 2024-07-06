@@ -42,19 +42,19 @@ def get_vacancies_from_db(ti):
         
     with psycopg2.connect(**sql_config) as connection:
         cur = connection.cursor()
-        cur.execute('select * from vacancy where (not responded) and (not has_test)')
+        cur.execute('select * from vacancy where (not responded) and (not has_test) and (not archived)')
         result = cur.fetchall()
         not_applied_ids = [row[0] for row in result]
     ti.xcom_push(key='not_applied_ids', value=not_applied_ids)
 
 
-def apply_to_vacancies(resume_id, ti):
+def apply_to_vacancies(resume_id, message, ti):
 
     vacancy_ids = ti.xcom_pull(task_ids='get_vacancies_from_db', key='not_applied_ids')
 
     HH_ACCESS_TOKEN = os.environ['HH_ACCESS_TOKEN']
     APP_NAME = 'my_super_applier_app'
-    MAX_DAY_APPLY_COUNT = 200
+    MAX_DAY_APPLY_COUNT = 100
 
     click_url = 'https://api.hh.ru/negotiations'
 
@@ -69,6 +69,7 @@ def apply_to_vacancies(resume_id, ti):
         params = {
             'vacancy_id': vacancy_id,
             'resume_id': resume_id,
+            'message': message
         }
 
         try:
@@ -97,7 +98,7 @@ def change_vacancies_status(ti):
 
     with psycopg2.connect(**sql_config) as connection:
         cur = connection.cursor()
-        cur.execute(f'update vacancy set responded = True where id in ({', '.join([(str(el)) for el in vacancy_ids])})')
+        cur.execute(f'update vacancy set responded = True where id in ({', '.join([str(el) for el in vacancy_ids])})')
     
 
 with DAG(
