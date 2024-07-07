@@ -273,7 +273,7 @@ with DAG(
     default_args=default_args,
     description='receives vacancies from hh and writes them to the database',
     start_date=datetime(2024, 6, 30),
-    schedule_interval='@daily',
+    schedule_interval='0 1 * * *',
     catchup=False
 ) as dag:
     task1 = PythonOperator(
