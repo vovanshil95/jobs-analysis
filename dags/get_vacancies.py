@@ -170,15 +170,16 @@ def get_currency_rates(ti):
     ti.xcom_push(key='rates', value=rates)
 
 
-def get_hh_vacancy_ids(search_request_text, key_words, ti):
+def get_hh_vacancy_ids(search_request_texts, key_words, drop_key_words, ti):
     jobs = []
-    for i in range(20):
-        items = requests.get('https://api.hh.ru/vacancies', params={'page': i, 'per_page': 100, 'text': search_request_text}).json()['items']
-        jobs.extend(items)
-        if len(items) < 100:
-            break
+    for search_request_text in search_request_texts:
+        for i in range(20):
+            items = requests.get('https://api.hh.ru/vacancies', params={'page': i, 'per_page': 100, 'text': search_request_text}).json()['items']
+            jobs.extend(items)
+            if len(items) < 100:
+                break
     
-    job_ids = set([int(job['id']) for job in jobs if in_(key_words, job['name'])])
+    job_ids = set([int(job['id']) for job in jobs if in_(key_words, job['name']) and not in_(drop_key_words, job['name'])])
     ti.xcom_push(key='job_ids', value=job_ids)
 
 
@@ -283,7 +284,13 @@ with DAG(
     task2 = PythonOperator(
         task_id='get_hh_vacancy_ids',
         python_callable=get_hh_vacancy_ids,
-        op_kwargs={'search_request_text': 'Data Scientist', 
+        op_kwargs={'search_request_texts': ['Data Scientist',
+                                            'ML Engineer',
+                                            'MLE',
+                                            'ML',
+                                            'computer vision',
+                                            'nlp',
+                                            'AI'],
                    'key_words': ['data',
                                  'ml',
                                  'machine learning',
@@ -294,7 +301,15 @@ with DAG(
                                  'данных',
                                  'компьютерное зрение',
                                  'LLM',
-                                 'recsys']}
+                                 'recsys'],
+                    'drop_key_words': ['mlops',
+                                       'ml ops',
+                                       'Data Engineer',
+                                       'Devops',
+                                       'рекрутер',
+                                       'Администратор',
+                                       'Системный аналитик',
+                                       'Инженер данных']}
     )
     task3 = PythonOperator(
         task_id='add_vacancies_to_db',
