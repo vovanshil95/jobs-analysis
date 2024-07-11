@@ -148,7 +148,7 @@ def df_to_db(df_, cur, table):
     values = []
     for i in range(len(df_)):
         values.append('(' + ', '.join(['NULL' if el is None
-                      else  "'" + str(el) + "'" 
+                      else  "'" + str(el).replace("'", "''") + "'" 
                       if not isinstance(el, np.int64)
                       and not isinstance(el, np.float64) 
                       and not isinstance(el, np.bool_)
