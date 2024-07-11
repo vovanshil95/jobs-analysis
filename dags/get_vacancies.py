@@ -99,8 +99,8 @@ def get_vacancies_df(ids, rates):
     df['currency'] = df.salary.apply(lambda el: el['currency'] if el is not None else None)
     df.replace(np.nan, None, inplace=True)
     df['rur_salary_avg'] = df.apply(lambda el: estimate_salary(el, rates), axis=1)
-    df['rur_salary_from'] = df.apply(lambda el: el['salary_from'] / rates[el['currency']] if el['salary_from'] is not None else None, axis=1)
-    df['rur_salary_to'] = df.apply(lambda el: el['salary_to'] / rates[el['currency']] if el['salary_to'] is not None else None, axis=1)
+    df['rur_salary_from'] = df.apply(lambda el: el['salary_from'] / rates[el['currency']] if el['salary_from'] is not None and el['currency'] in rates else None, axis=1)
+    df['rur_salary_to'] = df.apply(lambda el: el['salary_to'] / rates[el['currency']] if el['salary_to'] is not None and el['currency'] in rates else None, axis=1)
     df = df.drop(['salary'], axis=1)
 
     df['grade'] = df['name']\
