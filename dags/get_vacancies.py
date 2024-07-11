@@ -27,7 +27,7 @@ def in_(sub_strs, str_):
 
 
 def estimate_salary(el, rates):
-    if el['salary'] is not None:
+    if el['salary'] is not None and el['currency'] in rates:
         if el['salary_from'] is None:
             salary_amount = (el['salary_to'] * 0.66 + el['salary_to']) / 2
         elif el['salary_to'] is None:
