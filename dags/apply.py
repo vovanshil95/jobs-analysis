@@ -63,7 +63,7 @@ def apply_to_vacancies(resume_id, message, ti):
             'HH-User-Agent': APP_NAME
         }
     
-    successful_responses = []
+    responded = []
 
     for vacancy_id in vacancy_ids[:MAX_DAY_APPLY_COUNT]:
         params = {
@@ -78,27 +78,31 @@ def apply_to_vacancies(resume_id, message, ti):
                 headers=headers,
                 params=params
             )
-            if str(response.status_code)[0] == '2':
-                successful_responses.append(vacancy_id)
+            
+            resp_dict = response.json()
+
+            if str(response.status_code)[0] == '2' or resp_dict['description'] == 'Already applied':
+                responded.append(vacancy_id)
             else:
                 print(f'not successfull status code ({response.status_code}) while applying to {vacancy_id}')
-                print(f'response dict: {response.json()}')
+                print(f'response dict: {resp_dict}')
+                            
         except Exception as e:
             print(f'Exception while applying to {vacancy_id}', e)
 
         time.sleep(3)
     
-    ti.xcom_push(key='successful_responses', value=successful_responses)
+    ti.xcom_push(key='responded', value=responded)
 
 
 def change_vacancies_status(ti):
-    vacancy_ids = ti.xcom_pull(task_ids='apply_to_vacancies', key='successful_responses')
+    vacancy_ids = ti.xcom_pull(task_ids='apply_to_vacancies', key='responded')
+    if len(vacancy_ids) > 0:
+        sql_config = get_postgres()
 
-    sql_config = get_postgres()
-
-    with psycopg2.connect(**sql_config) as connection:
-        cur = connection.cursor()
-        cur.execute(f'update vacancy set responded = True where id in ({', '.join([str(el) for el in vacancy_ids])})')
+        with psycopg2.connect(**sql_config) as connection:
+            cur = connection.cursor()
+            cur.execute(f'update vacancy set responded = True where id in ({', '.join([str(el) for el in vacancy_ids])})')
     
 
 with DAG(
