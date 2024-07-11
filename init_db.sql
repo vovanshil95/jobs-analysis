@@ -1,5 +1,5 @@
 create table vacancy (
-    id serial primary key,
+    id bigint primary key,
     premium boolean,
     name_ text,
     department text,
@@ -34,11 +34,11 @@ create table vacancy (
 );
 
 create table key_skill (
-    id serial primary key,
+    id bigint primary key,
     name_ text
 );
 
 create table skill_vacancy (
-    skill_id serial,
-    vacancy_id serial
+    skill_id bigint,
+    vacancy_id bigint
 );
