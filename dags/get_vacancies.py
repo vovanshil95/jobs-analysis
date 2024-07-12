@@ -197,8 +197,18 @@ def add_vacancies_to_db(ti):
                        FROM vacancy 
                        where not archived""")
         result = cur.fetchall()
-
         ids_from_db = set([row[0] for row in result])
+
+        cur.execute("""SELECT id 
+                       FROM vacancy 
+                       where archived""")
+        result = cur.fetchall()
+        archived_ids_from_db = set([row[0] for row in result])
+
+        renewed_ids = archived_ids_from_db.intersection(ids_from_hh)
+        if len(renewed_ids) > 0:
+            cur.execute(f'delete from vacancy where id in ({', '.join(map(str, renewed_ids))})')
+
         new_ids = ids_from_hh - ids_from_db
         unfound_ids = ids_from_db - ids_from_hh
 
