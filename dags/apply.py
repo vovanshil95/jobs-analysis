@@ -78,10 +78,10 @@ def apply_to_vacancies(resume_id, message, ti):
                 headers=headers,
                 params=params
             )
-            
             resp_dict = response.json()
 
-            if str(response.status_code)[0] == '2' or resp_dict['description'] == 'Already applied':
+            if str(response.status_code)[0] == '2' or resp_dict.get('description') == 'Already applied':
+                print(f'successfully applied for a vacancy {vacancy_id}')
                 responded.append(vacancy_id)
             else:
                 print(f'not successfull status code ({response.status_code}) while applying to {vacancy_id}')
@@ -103,6 +103,7 @@ def change_vacancies_status(ti):
         with psycopg2.connect(**sql_config) as connection:
             cur = connection.cursor()
             cur.execute(f'update vacancy set responded = True where id in ({', '.join([str(el) for el in vacancy_ids])})')
+            connection.commit()
     
 
 with DAG(
