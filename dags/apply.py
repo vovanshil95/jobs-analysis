@@ -79,12 +79,13 @@ def apply_to_vacancies(resume_id, message, ti):
                 params=params
             )
             resp_dict = response.json()
+            resp_code = response.status_code
 
-            if str(response.status_code)[0] == '2' or resp_dict.get('description') == 'Already applied':
+            if (len(str(resp_code)) > 0 and str(resp_code)[0] == '2') or resp_dict.get('description') == 'Already applied':
                 print(f'successfully applied for a vacancy {vacancy_id}')
                 responded.append(vacancy_id)
             else:
-                print(f'not successfull status code ({response.status_code}) while applying to {vacancy_id}')
+                print(f'not successfull status code ({resp_code}) while applying to {vacancy_id}')
                 print(f'response dict: {resp_dict}')
                             
         except Exception as e:
